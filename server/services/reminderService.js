@@ -1,100 +1,105 @@
 const Lesson = require("../models/Lesson")
 const Notification = require("../models/Notification")
-const sendLessonReminderEmail =require("./emailService")
+const sendLessonReminderEmail = require("./emailService")
 const Teacher = require("../models/Teacher")
+
 const checkLessonReminders = async () => {
   try {
-    const now = new Date()
+    // Get today's date according to Israel time
+    const israelToday = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Jerusalem",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date())
 
-    console.log(
-      "Checking reminders:",
-      now.toLocaleString()
+    // Create tomorrow based on the Israeli calendar date
+    const [year, month, day] = israelToday.split("-").map(Number)
+
+    const tomorrow = new Date(
+      Date.UTC(year, month - 1, day + 1)
     )
 
-   const lessons = await Lesson.find({
-  $or: [
-    { reminderSent: false },
-    { reminderSent: { $exists: false } },
-  ],
-}).populate("studentId", "name phone email")
+    const tomorrowDate = [
+      tomorrow.getUTCFullYear(),
+      String(tomorrow.getUTCMonth() + 1).padStart(2, "0"),
+      String(tomorrow.getUTCDate()).padStart(2, "0"),
+    ].join("-")
+
     console.log(
-  "Lessons waiting for reminder:",
-  lessons.length
-)
+      "Checking reminders for tomorrow:",
+      tomorrowDate
+    )
+
+    const lessons = await Lesson.find({
+      date: tomorrowDate,
+      $or: [
+        { reminderSent: false },
+        { reminderSent: { $exists: false } },
+      ],
+    }).populate("studentId", "name phone email")
+
+
+    console.log(
+      "Tomorrow's lessons waiting for reminder:",
+      lessons.length
+    )
+
     for (const lesson of lessons) {
+      const studentName =
+        lesson.studentId?.name || "Student"
 
-      const lessonDateTime = new Date(
-  `${lesson.date}T${lesson.time}:00`
-)
+      const teacher = await Teacher.findById(
+        lesson.teacherId
+      ).select("notificationRetentionDays")
 
-const differenceMs =
-  lessonDateTime.getTime() - now.getTime()
+      let expiresAt = null
 
-const differenceHours =
-  differenceMs / (60 * 60 * 1000)
+      const retentionDays =
+        teacher &&
+        teacher.notificationRetentionDays !== undefined
+          ? teacher.notificationRetentionDays
+          : 30
 
-console.log(
-  `Lesson: ${lesson.date} ${lesson.time} | Hours away:`,
-  differenceHours
-)
+      if (retentionDays !== null) {
+        expiresAt = new Date()
 
-if (
-  differenceHours > 23 &&
-  differenceHours <= 24
-) {
-  const studentName =
-    lesson.studentId?.name || "Student"
-  const teacher = await Teacher.findById(
-  lesson.teacherId
-).select("notificationRetentionDays")
+        expiresAt.setDate(
+          expiresAt.getDate() + retentionDays
+        )
+      }
 
+      // Create notification for the teacher
+      await Notification.create({
+        teacherId: lesson.teacherId,
+        lessonId: lesson._id,
 
-let expiresAt = null
+        message:
+          `Reminder: You have a lesson with ${studentName} ` +
+          `tomorrow at ${lesson.time}.`,
 
-const retentionDays =
-  teacher &&
-  teacher.notificationRetentionDays !== undefined
-    ? teacher.notificationRetentionDays
-    : 30
+        expiresAt,
+      })
 
-if (retentionDays !== null) {
-  expiresAt = new Date()
+      // Send email to the student
+      if (lesson.studentId?.email) {
+        await sendLessonReminderEmail(
+          lesson.studentId.email,
+          studentName,
+          lesson.date,
+          lesson.time,
+          lesson.topic
+        )
+      }
 
-  expiresAt.setDate(
-    expiresAt.getDate() + retentionDays
-  )
-}
+      // Prevent duplicate reminders
+      lesson.reminderSent = true
+      await lesson.save()
 
- await Notification.create({
-  teacherId: lesson.teacherId,
-  lessonId: lesson._id,
-
-  message:
-    `Reminder: You have a lesson with ${studentName} ` +
-    `tomorrow at ${lesson.time}.`,
-
-  expiresAt,
-})
-
-  if (lesson.studentId?.email) {
-  await sendLessonReminderEmail(
-    lesson.studentId.email,
-    studentName,
-    lesson.date,
-    lesson.time,
-    lesson.topic
-  )
-}
-  lesson.reminderSent = true
-
-  await lesson.save()
-
-  console.log(
-    `✅ Reminder created for ${studentName}`
-  )
-}
+      console.log(
+        `✅ Reminder created for ${studentName}`
+      )
     }
-
   } catch (error) {
     console.error(
       "Reminder scheduler error:",

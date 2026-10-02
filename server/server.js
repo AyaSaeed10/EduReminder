@@ -1,14 +1,16 @@
 require("dotenv").config()
+
 const express = require("express")
 const cors = require("cors")
 const mongoose = require("mongoose")
-const studentRoutes = require("./routes/studentRoutes")
 const cookieParser = require("cookie-parser")
+
+const studentRoutes = require("./routes/studentRoutes")
 const authRoutes = require("./routes/authRoutes")
 const lessonRoutes = require("./routes/lessonRoutes")
 const notificationRoutes = require("./routes/notificationRoutes")
-const checkLessonReminders = require("./services/reminderService")
 const settingsRoutes = require("./routes/settingsRoutes")
+const cronRoutes = require("./routes/cronRoutes")
 
 const app = express()
 
@@ -22,12 +24,17 @@ app.use(
 
 app.use(express.json())
 app.use(cookieParser())
+
 // Routes
 app.use("/api/students", studentRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api/lessons", lessonRoutes)
 app.use("/api/notifications", notificationRoutes)
 app.use("/api/settings", settingsRoutes)
+
+// Cron route
+app.use("/api/cron", cronRoutes)
+
 // Test route
 app.get("/api/test", (req, res) => {
   res.json({
@@ -40,15 +47,6 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected successfully")
-
-    // Check once when server starts
-    checkLessonReminders()
-
-    // Then check every minute
-    setInterval(
-      checkLessonReminders,
-      60 * 1000
-    )
   })
   .catch((error) => {
     console.error("MongoDB connection error:", error)
