@@ -319,102 +319,150 @@ const handleDeleteStudent = async (id) => {
       )}
 
 
-      {/* Students List */}
-      <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden">
+{/* Students List */}
+<div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden">
 
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+  {/* List Header */}
+  <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+    <h2 className="text-lg sm:text-xl font-bold text-black dark:text-white">
+      Student List
+    </h2>
+  </div>
 
-          <h2 className="text-xl font-bold text-black dark:text-white">
-            Student List
-          </h2>
+  {students.length === 0 ? (
+    <div className="p-10 text-center">
+      <p className="text-gray-500 dark:text-gray-400">
+        No students added yet.
+      </p>
+    </div>
+  ) : (
+    <>
+      {/* Mobile View */}
+      <div className="md:hidden p-4 space-y-4">
+        {students.map((student) => (
+          <div
+            key={student._id}
+            className="
+              border border-gray-200 dark:border-gray-700
+              rounded-xl p-4
+            "
+          >
+            {/* Name */}
+            <h3 className="text-lg font-bold text-black dark:text-white">
+              {student.name}
+            </h3>
 
-        </div>
+            {/* Phone */}
+            <div className="mt-4">
+              <p className="text-xs font-bold uppercase text-gray-400">
+                Phone Number
+              </p>
 
+              <p className="mt-1 text-gray-700 dark:text-gray-300">
+                {student.phone}
+              </p>
+            </div>
 
-        {students.length === 0 ? (
+            {/* Email */}
+            <div className="mt-3 min-w-0">
+              <p className="text-xs font-bold uppercase text-gray-400">
+                Email
+              </p>
 
-          <div className="p-10 text-center">
+              <p className="mt-1 text-gray-700 dark:text-gray-300 break-all">
+                {student.email}
+              </p>
+            </div>
 
-            <p className="text-gray-500 dark:text-gray-400">
-              No students added yet.
-            </p>
+            {/* Actions */}
+            <div className="
+              flex items-center justify-end
+              gap-5 mt-5 pt-4
+              border-t border-gray-200 dark:border-gray-700
+            ">
+              <button
+                onClick={() => handleEditStudent(student)}
+                className="text-purple-700 dark:text-purple-400 font-bold"
+              >
+                Edit
+              </button>
 
+              <button
+                onClick={() => handleDeleteStudent(student._id)}
+                className="text-red-600 dark:text-red-400 font-bold"
+              >
+                Delete
+              </button>
+            </div>
           </div>
-
-        ) : (
-
-          <table className="w-full">
-
-            <thead className="bg-purple-50 dark:bg-gray-700">
-
-              <tr>
-
-                <th className="text-left px-6 py-4 text-black dark:text-white">
-                  Name
-                </th>
-
-                <th className="text-left px-6 py-4 text-black dark:text-white">
-                  Phone Number
-                </th>
-                <th className="text-left px-6 py-4 text-black dark:text-white">
-                    Email
-                </th>
-                <th className="text-right px-6 py-4 text-black dark:text-white">
-                  Actions
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {students.map((student) => (
-
-                <tr
-                  key={student._id}
-                  className="border-t border-gray-200 dark:border-gray-700"
-                >
-
-                  <td className="px-6 py-4 text-black dark:text-white">
-                    {student.name}
-                  </td>
-
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
-                    {student.phone}
-                  </td>
-                   <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
-                    {student.email}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-
-                    <button
-                      onClick={() => handleEditStudent(student)}
-                      className="text-purple-700 dark:text-purple-400 font-bold mr-4"
-                    >
-                      Edit
-                    </button>
-
-                   <button
-                      onClick={() => handleDeleteStudent(student._id)}
-                      className="text-red-600 dark:text-red-400 font-bold"
-                    >
-                      Delete
-                    </button>
-
-                  </td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
-
-        )}
-
+        ))}
       </div>
+
+      {/* Desktop / Tablet View */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-purple-50 dark:bg-gray-700">
+            <tr>
+              <th className="text-left px-6 py-4 text-black dark:text-white">
+                Name
+              </th>
+
+              <th className="text-left px-6 py-4 text-black dark:text-white">
+                Phone Number
+              </th>
+
+              <th className="text-left px-6 py-4 text-black dark:text-white">
+                Email
+              </th>
+
+              <th className="text-right px-6 py-4 text-black dark:text-white">
+                Actions
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {students.map((student) => (
+              <tr
+                key={student._id}
+                className="border-t border-gray-200 dark:border-gray-700"
+              >
+                <td className="px-6 py-4 text-black dark:text-white">
+                  {student.name}
+                </td>
+
+                <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
+                  {student.phone}
+                </td>
+
+                <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
+                  {student.email}
+                </td>
+
+                <td className="px-6 py-4 text-right whitespace-nowrap">
+                  <button
+                    onClick={() => handleEditStudent(student)}
+                    className="text-purple-700 dark:text-purple-400 font-bold mr-4"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => handleDeleteStudent(student._id)}
+                    className="text-red-600 dark:text-red-400 font-bold"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )}
+
+</div>
 
     </div>
   )

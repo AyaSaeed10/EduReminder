@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { API_URL } from "../services/api"
+
 function Dashboard() {
   const navigate = useNavigate()
 
@@ -13,24 +14,23 @@ function Dashboard() {
     const loadDashboard = async () => {
       try {
         const [studentsResponse, lessonsResponse, notificationsResponse] =
-        await Promise.all([
-          fetch(`${API_URL}/api/students`, {
-            credentials: "include",
-          }),
+          await Promise.all([
+            fetch(`${API_URL}/api/students`, {
+              credentials: "include",
+            }),
 
-          fetch(`${API_URL}/api/lessons`, {
-            credentials: "include",
-          }),
+            fetch(`${API_URL}/api/lessons`, {
+              credentials: "include",
+            }),
 
-          fetch(`${API_URL}/api/notifications`, {
-            credentials: "include",
-          }),
-        ])
+            fetch(`${API_URL}/api/notifications`, {
+              credentials: "include",
+            }),
+          ])
 
         const studentsData = await studentsResponse.json()
         const lessonsData = await lessonsResponse.json()
-        const notificationsData =
-          await notificationsResponse.json()
+        const notificationsData = await notificationsResponse.json()
 
         setStudents(studentsData)
         setLessons(lessonsData)
@@ -87,10 +87,11 @@ function Dashboard() {
   }
 
   return (
-    <div>
+    <div className="w-full min-w-0">
+
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-extrabold text-black dark:text-white">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white">
           Dashboard
         </h1>
 
@@ -127,10 +128,12 @@ function Dashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex flex-wrap gap-3 mt-8">
+      <div className="flex flex-col sm:flex-row gap-3 mt-8">
+
         <button
           onClick={() => navigate("/students")}
           className="
+            w-full sm:w-auto
             bg-purple-700 hover:bg-purple-800
             text-white font-bold
             px-5 py-3 rounded-lg transition
@@ -142,6 +145,7 @@ function Dashboard() {
         <button
           onClick={() => navigate("/calendar")}
           className="
+            w-full sm:w-auto
             border-2 border-purple-700
             text-purple-700 dark:text-purple-400
             dark:border-purple-400
@@ -152,24 +156,28 @@ function Dashboard() {
         >
           + Schedule Lesson
         </button>
+
       </div>
 
       {/* Lessons */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8">
 
         {/* Today's Lessons */}
-        <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6">
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="text-xl font-bold text-black dark:text-white">
+        <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 sm:p-6 min-w-0">
+
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-5">
+
+            <h2 className="text-lg sm:text-xl font-bold text-black dark:text-white">
               Today's Lessons
             </h2>
 
             <button
               onClick={() => navigate("/calendar")}
-              className="text-purple-700 dark:text-purple-400 font-bold"
+              className="text-purple-700 dark:text-purple-400 font-bold text-left sm:text-right"
             >
               View Calendar →
             </button>
+
           </div>
 
           {todayLessons.length === 0 ? (
@@ -187,21 +195,25 @@ function Dashboard() {
               ))}
             </div>
           )}
+
         </section>
 
         {/* Upcoming Lessons */}
-        <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6">
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="text-xl font-bold text-black dark:text-white">
+        <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 sm:p-6 min-w-0">
+
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-5">
+
+            <h2 className="text-lg sm:text-xl font-bold text-black dark:text-white">
               Upcoming Lessons
             </h2>
 
             <button
               onClick={() => navigate("/calendar")}
-              className="text-purple-700 dark:text-purple-400 font-bold"
+              className="text-purple-700 dark:text-purple-400 font-bold text-left sm:text-right"
             >
               View All →
             </button>
+
           </div>
 
           {upcomingLessons.length === 0 ? (
@@ -219,22 +231,27 @@ function Dashboard() {
               ))}
             </div>
           )}
+
         </section>
+
       </div>
 
       {/* Recent Notifications */}
-      <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mt-6">
-        <div className="flex justify-between items-center mb-5">
-          <h2 className="text-xl font-bold text-black dark:text-white">
+      <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 sm:p-6 mt-6 min-w-0">
+
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-5">
+
+          <h2 className="text-lg sm:text-xl font-bold text-black dark:text-white">
             Recent Notifications
           </h2>
 
           <button
             onClick={() => navigate("/notifications")}
-            className="text-purple-700 dark:text-purple-400 font-bold"
+            className="text-purple-700 dark:text-purple-400 font-bold text-left sm:text-right"
           >
             View All →
           </button>
+
         </div>
 
         {recentNotifications.length === 0 ? (
@@ -249,9 +266,10 @@ function Dashboard() {
                 className="
                   border border-gray-200 dark:border-gray-700
                   rounded-xl p-4
+                  break-words
                 "
               >
-                <p className="font-semibold text-black dark:text-white">
+                <p className="font-semibold text-black dark:text-white break-words">
                   {notification.message}
                 </p>
 
@@ -264,7 +282,9 @@ function Dashboard() {
             ))}
           </div>
         )}
+
       </section>
+
     </div>
   )
 }
@@ -274,24 +294,28 @@ function StatCard({ icon, title, value }) {
     <div
       className="
         bg-white dark:bg-gray-800
-        rounded-2xl shadow-md p-6
+        rounded-2xl shadow-md
+        p-4 sm:p-6
         border border-gray-100 dark:border-gray-700
+        min-w-0
       "
     >
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-center justify-between gap-4">
+
+        <div className="min-w-0">
           <p className="text-gray-500 dark:text-gray-400 font-semibold">
             {title}
           </p>
 
-          <p className="text-3xl font-extrabold text-black dark:text-white mt-2">
+          <p className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white mt-2">
             {value}
           </p>
         </div>
 
-        <span className="text-3xl">
+        <span className="text-3xl shrink-0">
           {icon}
         </span>
+
       </div>
     </div>
   )
@@ -303,20 +327,25 @@ function LessonRow({ lesson, showDate }) {
       className="
         border border-gray-200 dark:border-gray-700
         rounded-xl p-4
-        flex justify-between items-center
+        flex flex-col sm:flex-row
+        sm:justify-between sm:items-center
+        gap-2
+        min-w-0
       "
     >
-      <div>
-        <p className="font-bold text-black dark:text-white">
+
+      <div className="min-w-0">
+        <p className="font-bold text-black dark:text-white break-words">
           {lesson.studentId?.name || "Student"}
         </p>
 
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 break-words">
           {lesson.topic}
         </p>
       </div>
 
-      <div className="text-right">
+      <div className="text-left sm:text-right shrink-0">
+
         {showDate && (
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {lesson.date}
@@ -326,7 +355,9 @@ function LessonRow({ lesson, showDate }) {
         <p className="font-bold text-purple-700 dark:text-purple-400">
           {lesson.time}
         </p>
+
       </div>
+
     </div>
   )
 }

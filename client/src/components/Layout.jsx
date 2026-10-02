@@ -18,7 +18,7 @@ const handleLogout = async () => {
   }
 }
 const [teacher, setTeacher] = useState(null)
-
+const [menuOpen, setMenuOpen] = useState(false)
 useEffect(() => {
   const getTeacher = async () => {
     try {
@@ -41,9 +41,29 @@ useEffect(() => {
 }, [])
   return (
     <div className="min-h-screen flex bg-[#F7F3EB] dark:bg-gray-900">
-
+    {menuOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
       {/* Sidebar */}
-      <aside className="w-64 bg-white dark:bg-gray-800 shadow-md flex flex-col">
+     <aside
+        className={`
+          fixed
+          top-0 left-0
+          z-50
+          h-screen
+          w-64
+          bg-white dark:bg-gray-800
+          shadow-md
+          flex flex-col
+          overflow-hidden
+          transition-transform duration-300
+          ${menuOpen ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0
+        `}
+      >
 
         {/* Logo */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -57,10 +77,11 @@ useEffect(() => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
 
           <NavLink
             to="/dashboard"
+            onClick={() => setMenuOpen(false)}
             className={({ isActive }) =>
               `block px-4 py-3 rounded-lg font-semibold transition ${
                 isActive
@@ -74,6 +95,7 @@ useEffect(() => {
 
           <NavLink
             to="/calendar"
+            onClick={() => setMenuOpen(false)}
             className={({ isActive }) =>
               `block px-4 py-3 rounded-lg font-semibold transition ${
                 isActive
@@ -87,6 +109,7 @@ useEffect(() => {
 
           <NavLink
             to="/students"
+            onClick={() => setMenuOpen(false)}
             className={({ isActive }) =>
               `block px-4 py-3 rounded-lg font-semibold transition ${
                 isActive
@@ -100,6 +123,7 @@ useEffect(() => {
 
           <NavLink
             to="/notifications"
+            onClick={() => setMenuOpen(false)}
             className={({ isActive }) =>
               `block px-4 py-3 rounded-lg font-semibold transition ${
                 isActive
@@ -112,6 +136,7 @@ useEffect(() => {
           </NavLink>
            <NavLink
             to="/settings"
+            onClick={() => setMenuOpen(false)}
             className={({ isActive }) =>
               `block px-4 py-3 rounded-lg font-semibold transition ${
                 isActive
@@ -126,19 +151,19 @@ useEffect(() => {
         </nav>
 
         {/* Logout */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+     <div className="p-4 border-t border-gray-200 dark:border-gray-700">
         <button
-            onClick={handleLogout}
-            className="w-full py-3 text-red-600 font-bold hover:bg-red-50 dark:hover:bg-gray-700 rounded-lg"
-            >
-            Logout
+          onClick={handleLogout}
+          className="w-full py-3 text-red-600 font-bold hover:bg-red-50 dark:hover:bg-gray-700 rounded-lg"
+        >
+          Logout
         </button>
-        </div>
+    </div>
 
       </aside>
 
       {/* Right Side */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col md:ml-64 min-w-0">
 
         {/* Header */}
         <header
@@ -150,13 +175,23 @@ useEffect(() => {
             flex
             items-center
             justify-between
-            px-8
+            px-4 md:px-8
           "
         >
 
-          <h2 className="font-bold text-xl text-black dark:text-white">
+          <div className="flex items-center gap-3">
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="md:hidden text-2xl text-gray-800 dark:text-white"
+            aria-label="Open menu"
+          >
+            ☰
+          </button>
+
+          <h2 className="font-bold text-base sm:text-xl text-black dark:text-white">
             Welcome, {teacher?.name || "Teacher"}
           </h2>
+        </div>
 
           {/* Header Right Side */}
           <div className="flex items-center gap-4">
@@ -172,7 +207,7 @@ useEffect(() => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8 min-w-0 overflow-x-hidden">
           <Outlet />
         </main>
 
