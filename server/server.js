@@ -11,7 +11,7 @@ const lessonRoutes = require("./routes/lessonRoutes")
 const notificationRoutes = require("./routes/notificationRoutes")
 const settingsRoutes = require("./routes/settingsRoutes")
 const cronRoutes = require("./routes/cronRoutes")
-
+const connectDB = require("./config/db")
 const app = express()
 
 // Middleware
@@ -24,7 +24,19 @@ app.use(
 
 app.use(express.json())
 app.use(cookieParser())
+app.use(async (req, res, next) => {
+  try {
+    await connectDB()
+    next()
+  } catch (error) {
+    console.error("Database connection failed:", error)
 
+    res.status(500).json({
+      success: false,
+      message: "Database connection failed",
+    })
+  }
+})
 // Routes
 app.use("/api/students", studentRoutes)
 app.use("/api/auth", authRoutes)
@@ -42,15 +54,7 @@ app.get("/api/test", (req, res) => {
   })
 })
 
-// MongoDB connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected successfully")
-  })
-  .catch((error) => {
-    console.error("MongoDB connection error:", error)
-  })
+
 
 // Start server
 const PORT = process.env.PORT || 5000
